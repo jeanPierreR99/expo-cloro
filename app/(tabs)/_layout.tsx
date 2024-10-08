@@ -1,34 +1,47 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { TabBarIcon } from "@/components/navigation/TabBarIcon";
+import { Tabs, Stack } from "expo-router";
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function Layout() {
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-      }}>
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
+          title: "Inicio",
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon
+              name={focused ? "home" : "home-outline"}
+              color={"red"}
+            />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="profile"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+          title: "Perfil",
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon
+              name={focused ? "person-circle-sharp" : "person-circle-outline"}
+              color={"red"}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: "Historial",
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon
+              name={focused ? "time" : "time-outline"}
+              color={"red"}
+            />
           ),
         }}
       />
