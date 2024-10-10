@@ -12,7 +12,6 @@ export default function Header() {
     const userStorage = await loadUserFromStorage();
     console.log(userStorage)
     if (userStorage) {
-      console.log(userStorage)
       setUser(userStorage);
     }
   };
@@ -45,7 +44,7 @@ export default function Header() {
         {user?.gestor.gestor_name_complete}
       </Text>
       <Text className="text-gray-200">
-        Gestor de la comunidad {user?.centro_poblado.centro_nombre}
+        Gestor del C.P {user?.centro_poblado.centro_nombre}
       </Text>
       <Text className="text-gray-200 text-right">{date}</Text>
     </View>

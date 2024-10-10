@@ -7,6 +7,8 @@ export interface gestor {
   gestor_dni: string;
   gestor_name_complete: string;
   gestor_phone: string;
+  gestor_user: string;
+  gestor_password: string;
 }
 export interface centro_poblado {
   centro_id: string;

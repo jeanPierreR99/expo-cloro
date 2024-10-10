@@ -23,7 +23,6 @@ import { showMessage } from "@/js/functions";
 const logo = require("../assets/images/logo-drvcs.png");
 const db = getFirestore(appFirebase);
 
-
 export default function login() {
   const router = useRouter();
   const [user, setUser] = useState("");
@@ -62,7 +61,8 @@ export default function login() {
     const userQuery = query(
       collection(db, "gestores"),
       where("gestor_user", "==", user),
-      where("gestor_password", "==", password)
+      where("gestor_password", "==", password),
+      where("gestor_status", "==", true)
     );
     try {
       const querySnapshot = await getDocs(userQuery);

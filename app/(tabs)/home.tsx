@@ -21,7 +21,6 @@ import {
 import { getDatabase, ref, onValue } from "firebase/database"; // Asegúrate de que estás usando Realtime Database
 
 const db = getFirestore(appFirebase);
-const database = getDatabase(appFirebase);
 
 interface monitorCloro {
   monitor_cloro_id: string;

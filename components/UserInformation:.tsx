@@ -1,4 +1,9 @@
-import { InformationAll, loadUserFromStorage } from "@/js/functions";
+import {
+  InformationAll,
+  loadUserFromStorage,
+  removeUserData,
+  showMessage,
+} from "@/js/functions";
 import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
@@ -7,10 +12,19 @@ import {
   View,
   Modal,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
+import { doc, getFirestore, updateDoc } from "firebase/firestore";
+import appFirebase from "../js/credentialFirebase";
+import Toast from "react-native-toast-message";
+const db = getFirestore(appFirebase);
 
 const UserInformation = () => {
   const [user, setUser] = useState<InformationAll | null>(null);
+  const [editUser, setEditUser] = useState<string>("");
+  const [editPassword, setEditPassword] = useState<string>("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const loadUserStorage = async () => {
     const userStorage = await loadUserFromStorage();
@@ -19,11 +33,32 @@ const UserInformation = () => {
     }
   };
 
+  const changeCredentials = async () => {
+    if (user && editUser != "" && editPassword != "") {
+      setLoading(true);
+      const docRefGestor = doc(db, "gestores", user.gestor.gestor_id);
+      const values = {
+        gestor_user: editUser,
+        gestor_password: editPassword,
+      };
+      await updateDoc(docRefGestor, values);
+      setModalVisible(false);
+      removeUserData();
+    } else {
+      showMessage(
+        "error",
+        "Error al subir a la nube",
+        `Rellene todos los datos`
+      );
+    }
+    setLoading(false);
+    return;
+  };
+
   useEffect(() => {
     loadUserStorage();
   }, []);
 
-  const [modalVisible, setModalVisible] = useState(false);
   return (
     <View style={styles.infoContainer}>
       <Text style={styles.sectionTitle}>Información</Text>
@@ -76,7 +111,7 @@ const UserInformation = () => {
           className="bg-red-500"
           onPress={() => setModalVisible(true)}
         >
-          <Text style={styles.buttonText}>Editar información</Text>
+          <Text style={styles.buttonText}>Editar Credenciales</Text>
         </TouchableOpacity>
       </View>
       {/* Modal */}
@@ -90,49 +125,45 @@ const UserInformation = () => {
       >
         <View style={styles.modalContainer} className="relative">
           <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Editar Información</Text>
-
+            <Text style={styles.modalText}>Editar Credenciales</Text>
+            <Text className="font-bold">Usuario:</Text>
             <TextInput
               style={styles.modalInput}
-              placeholder="Email"
+              onChangeText={(e) => setEditUser(e)}
+              placeholder={user?.gestor.gestor_user}
               placeholderTextColor="#888"
-              keyboardType="email-address"
+              keyboardType="default"
             />
+            <Text className="font-bold">Contraseña:</Text>
             <TextInput
               style={styles.modalInput}
-              placeholder="Email"
+              onChangeText={(e) => setEditPassword(e)}
+              placeholder={user?.gestor.gestor_password}
               placeholderTextColor="#888"
-              keyboardType="email-address"
-            />
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Email"
-              placeholderTextColor="#888"
-              keyboardType="email-address"
-            />
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Email"
-              placeholderTextColor="#888"
-              keyboardType="email-address"
+              keyboardType="default"
             />
             <TouchableOpacity
               className="absolute top-2 right-4"
               onPress={() => setModalVisible(false)}
             >
-              <Text className="text-gray-400 text-lg">X</Text>
+              <Text className="text-gray-400 text-lg p-1">X</Text>
             </TouchableOpacity>
             <View>
               <TouchableOpacity
                 style={styles.button}
                 className="bg-red-500"
-                onPress={() => setModalVisible(true)}
+                onPress={() => changeCredentials()}
               >
-                <Text style={styles.buttonText}>Enviar</Text>
+                {loading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>Enviar</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
         </View>
+        <Toast />
       </Modal>
     </View>
   );
@@ -207,7 +238,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
   },
- 
 });
 
 export default UserInformation;
