@@ -8,7 +8,13 @@ import {
   where,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, FlatList, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import appFirebase from "../../js/credentialFirebase";
 import { Picker } from "@react-native-picker/picker";
 import { loadUserFromStorage } from "@/js/functions";
@@ -25,31 +31,38 @@ interface HistoryItem {
 
 export default function History() {
   const [monitorCloro, setMonitorCloro] = useState<HistoryItem[] | null>(null);
+  const [error, setError] = useState<boolean>(false);
   const [selectedMonitoreo, setSelectedMonitoreo] = useState("Todos");
 
   const handleMonitorHistory = async () => {
-    const user = await loadUserFromStorage();
-    if (user) {
-      const userQuery = query(
-        collection(db, "monitor_cloro"),
-        where("monitor_cloro_gestor_id", "==", user?.gestor.gestor_id)
-      );
+    try {
+      setError(false);
+      const user = await loadUserFromStorage();
+      if (user) {
+        const userQuery = query(
+          collection(db, "monitor_cloro"),
+          where("monitor_cloro_gestor_id", "==", user?.gestor.gestor_id)
+        );
 
-      const unsubscribe = onSnapshot(userQuery, (querySnapshot) => {
-        const docHistory: any[] = [];
+        const unsubscribe = onSnapshot(userQuery, (querySnapshot) => {
+          const docHistory: any[] = [];
 
-        querySnapshot.forEach((doc) => {
-          const docData = doc.data();
-          docHistory.push({ ...docData });
+          querySnapshot.forEach((doc) => {
+            const docData = doc.data();
+            docHistory.push({ ...docData });
+          });
+
+          setMonitorCloro(docHistory);
         });
 
-        setMonitorCloro(docHistory);
-      });
+        return unsubscribe;
+      }
 
-      return unsubscribe;
+      return undefined;
+    } catch (e) {
+      setError(true);
+      console.log(e);
     }
-
-    return undefined;
   };
 
   useEffect(() => {
@@ -114,15 +127,17 @@ export default function History() {
         <Picker.Item label="Segundo Monitoreo" value="Segundo Monitoreo" />
         <Picker.Item label="Tercer Monitoreo" value="Tercer Monitoreo" />
       </Picker>
-      <FlatList
-        data={filteredData}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={
-          <ActivityIndicator size={24}></ActivityIndicator>
-        }
-      />
+      {!error ? (
+        <FlatList
+          data={filteredData}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={styles.listContainer}
+          ListEmptyComponent={<ActivityIndicator size={24}></ActivityIndicator>}
+        />
+      ) : (
+        <Text className="ml-4">Ocurrio un error</Text>
+      )}
     </View>
   );
 }

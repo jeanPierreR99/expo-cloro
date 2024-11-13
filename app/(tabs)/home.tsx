@@ -18,9 +18,10 @@ import {
   loadUserFromStorage,
   showMessage,
 } from "@/js/functions";
-import { getDatabase, ref, onValue } from "firebase/database"; // Asegúrate de que estás usando Realtime Database
+import { getDatabase, ref, onValue, Unsubscribe } from "firebase/database"; // Asegúrate de que estás usando Realtime Database
 
 const db = getFirestore(appFirebase);
+const dbRealTime = getDatabase(appFirebase);
 
 interface monitorCloro {
   monitor_cloro_id: string;
@@ -34,13 +35,15 @@ interface monitorCloro {
 }
 
 export default function home() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [selectedMonitoreo, setSelectedMonitoreo] =
-    useState("Primer Monitoreo");
-  const [selectedPunto, setSelectedPunto] = useState("Reservorio");
+    useState<string>("Primer Monitoreo");
+  const [selectedPunto, setSelectedPunto] = useState<string>("Reservorio");
   const [cloro, setCloro] = useState<number>(0);
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState<string>("");
   const [observaciones, setObservaciones] = useState<string>("s/o");
+  const [isListening, setIsListening] = useState<boolean>(true);
+  const [unsubscribe, setUnsubscribe] = useState<Unsubscribe | null>(null);
 
   function getDate() {
     const now = new Date();
@@ -48,25 +51,29 @@ export default function home() {
     setDate(localDate);
   }
 
-  const getDatAuxiliar = async () => {
+  const HandleSocket = async () => {
+    setIsListening(!isListening);
     const user = await loadUserFromStorage();
 
     if (user) {
       const centroId = user.centro_poblado.centro_id;
-      const db = getDatabase(appFirebase); // Obtén la instancia de la base de datos
-      const cloroRef = ref(db, `monitor_auxiliar/${centroId}`); // Referencia a tu nodo específico
+      const cloroRef = ref(dbRealTime, `monitor_auxiliar/${centroId}`); // Referencia a tu nodo específico
 
-      const unsubscribe = onValue(cloroRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          console.log(data);
-          setCloro(data.val_cloro); // Actualiza el estado con el valor de cloro
-        } else {
-          console.log("no hay data");
+      if (isListening) {
+        const listener = onValue(cloroRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            setCloro(data.val_cloro);
+          }
+        });
+
+        setUnsubscribe(() => listener);
+      } else {
+        if (unsubscribe) {
+          unsubscribe();
+          setUnsubscribe(null);
         }
-      });
-
-      return unsubscribe; // Limpia el suscriptor al desmontar el componente
+      }
     }
   };
 
@@ -90,7 +97,6 @@ export default function home() {
       };
 
       await setDoc(docRef, valMonitorCloro);
-      console.log("subido");
       showMessage(
         "success",
         "Subido correctamente a la nube",
@@ -108,20 +114,20 @@ export default function home() {
   };
 
   useEffect(() => {
-    let unsubscribe: () => void = () => {};
+    // let unsubscribe: () => void = () => {};
 
-    const fetchMonitorAuxiliar = async () => {
-      const result = await getDatAuxiliar();
-      if (result) {
-        unsubscribe = result;
-      }
-    };
+    // const fetchMonitorAuxiliar = async () => {
+    // const result = await getDatAuxiliar();
+    //   if (result) {
+    //     unsubscribe = result;
+    //   }
+    // };
 
-    fetchMonitorAuxiliar();
+    // fetchMonitorAuxiliar();
     getDate();
-    return () => {
-      unsubscribe();
-    };
+    // return () => {
+    // unsubscribe();
+    // };
   }, []);
 
   return (
@@ -154,13 +160,29 @@ export default function home() {
         </Picker>
 
         <Text className="text-6xl text-gray-400 mt-10">{cloro} %Cl</Text>
-
+        {!isListening && (
+          <Text className="text-xs text-gray-400 my-2">
+            Obteniendo datos...
+          </Text>
+        )}
         <TextInput
+          className="border border-gray-300 focus:border-red-500"
           style={styles.modalInput}
           onChangeText={(text) => setObservaciones(text)}
           placeholder="Observaciones"
           placeholderTextColor="#888"
         />
+
+        <TouchableOpacity
+          style={styles.button}
+          className="bg-gray-300"
+          onPress={HandleSocket}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {isListening ? "Activar" : "Detener"}
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
           className="bg-red-500"
@@ -202,11 +224,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   modalInput: {
+    paddingLeft: 12,
     width: "100%",
-    borderWidth: 0.5,
     padding: 5,
-    borderRadius: 10,
-    color: "#000",
+    borderRadius: 20,
     fontSize: 16,
   },
 });

@@ -2,7 +2,11 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import Icon from "@expo/vector-icons/Ionicons";
-import { InformationAll, loadUserFromStorage, removeUserData } from "@/js/functions";
+import {
+  InformationAll,
+  loadUserFromStorage,
+  removeUserData,
+} from "@/js/functions";
 
 export default function Header() {
   const [date, setDate] = useState("");
@@ -10,7 +14,6 @@ export default function Header() {
 
   const loadUserStorage = async () => {
     const userStorage = await loadUserFromStorage();
-    console.log(userStorage)
     if (userStorage) {
       setUser(userStorage);
     }

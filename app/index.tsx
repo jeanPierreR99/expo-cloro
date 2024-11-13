@@ -140,18 +140,18 @@ export default function login() {
         </Text>
 
         <TextInput
-          className="border border-gray-400 focus:border-red-500"
+          className="border border-gray-300 focus:border-red-500"
           style={styles.input}
-          placeholder="user"
+          placeholder="Ingrese su Usuario"
           placeholderTextColor="#888"
-          keyboardType="email-address"
+          keyboardType="default"
           value={user}
           onChangeText={setUser}
         />
         <TextInput
-          className="border border-gray-400 focus:border-red-500"
+          className="border border-gray-300 focus:border-red-500"
           style={styles.input}
-          placeholder="Password"
+          placeholder="Ingrese su Contraseña"
           placeholderTextColor="#888"
           secureTextEntry
           value={password}
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
 
-    padding: 10,
+    padding: 8,
     borderRadius: 20,
     color: "#000",
     fontSize: 16,

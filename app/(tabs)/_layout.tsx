@@ -2,11 +2,17 @@ import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { Tabs, Stack } from "expo-router";
 
 export default function Layout() {
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarLabelStyle: {
+          fontSize: 16,
+        },
+        tabBarStyle: {
+          height: 60,
+        },
+        tabBarActiveTintColor: "red",
       }}
     >
       <Tabs.Screen
@@ -37,6 +43,9 @@ export default function Layout() {
         name="history"
         options={{
           title: "Historial",
+          // tabBarLabelStyle: {
+          //   fontSize: 18,
+          // },
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               name={focused ? "time" : "time-outline"}
