@@ -8,6 +8,7 @@ export default function Layout() {
         headerShown: false,
         tabBarLabelStyle: {
           fontSize: 16,
+          fontWeight: 500,
         },
         tabBarStyle: {
           height: 60,
@@ -22,7 +23,7 @@ export default function Layout() {
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               name={focused ? "home" : "home-outline"}
-              color={"red"}
+              color={focused ? "red" : "gray"}
             />
           ),
         }}
@@ -34,7 +35,7 @@ export default function Layout() {
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               name={focused ? "person-circle-sharp" : "person-circle-outline"}
-              color={"red"}
+              color={focused ? "red" : "gray"}
             />
           ),
         }}
@@ -49,7 +50,7 @@ export default function Layout() {
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
               name={focused ? "time" : "time-outline"}
-              color={"red"}
+              color={focused ? "red" : "gray"}
             />
           ),
         }}

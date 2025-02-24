@@ -9,6 +9,7 @@ export interface gestor {
   gestor_phone: string;
   gestor_user: string;
   gestor_password: string;
+  gestor_image: string;
 }
 export interface centro_poblado {
   centro_id: string;
@@ -39,7 +40,7 @@ export const loadUserFromStorage = async () => {
 
 export const removeUserData = async () => {
   try {
-    await AsyncStorage.removeItem("user"); // Aquí 'user' es la clave del valor que quieres eliminar
+    await AsyncStorage.removeItem("user");
     console.log("Usuario eliminado de AsyncStorage");
     router.replace("/");
   } catch (error) {

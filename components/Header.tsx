@@ -1,5 +1,4 @@
-// components/Header.js
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import Icon from "@expo/vector-icons/Ionicons";
 import {
@@ -39,7 +38,7 @@ export default function Header() {
       </TouchableOpacity>
       <Image
         source={{
-          uri: "https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg",
+          uri: user?.gestor.gestor_image,
         }}
         className="w-[100px] h-[100px] rounded-full"
       />

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "expo-router";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   StyleSheet,
   Text,
@@ -28,6 +29,7 @@ export default function login() {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [error, setError] = useState("");
 
@@ -108,7 +110,7 @@ export default function login() {
 
   const saveUserToStorage = async (userStorage: any) => {
     try {
-      await AsyncStorage.setItem("user", JSON.stringify(userStorage)); // Convertimos el objeto a string
+      await AsyncStorage.setItem("user", JSON.stringify(userStorage));
       router.replace("/home");
       console.log("Usuario guardado en AsyncStorage");
     } catch (e) {
@@ -140,7 +142,7 @@ export default function login() {
         </Text>
 
         <TextInput
-          className="border border-gray-300 focus:border-red-500"
+          className="border px-2 border-gray-300 focus:border-red-500"
           style={styles.input}
           placeholder="Ingrese su Usuario"
           placeholderTextColor="#888"
@@ -148,21 +150,29 @@ export default function login() {
           value={user}
           onChangeText={setUser}
         />
-        <TextInput
-          className="border border-gray-300 focus:border-red-500"
-          style={styles.input}
-          placeholder="Ingrese su Contraseña"
-          placeholderTextColor="#888"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+        <View className="relative w-full">
+          <TextInput
+            className="border px-2 border-gray-300 focus:border-red-500"
+            style={styles.input}
+            placeholder="Ingrese su Contraseña"
+            placeholderTextColor="#888"
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity className="absolute top-[7px] right-5" onPress={() => setShowPassword(!showPassword)}>
+            <Text >
+              {showPassword ? <Ionicons name="eye-off-outline" size={26} color="#cbc9c9d9" /> : <Ionicons name="eye-outline" size={26} color="#cbc9c9d9" />}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         {error && <Text style={styles.error}>{error}</Text>}
         <TouchableOpacity
           style={styles.button}
           className="bg-red-500"
           onPress={handleLogin}
-          disabled={loading} // Deshabilita el botón si se está cargando
+          disabled={loading}
         >
           {loading ? (
             <ActivityIndicator size="small" color="#fff" />
@@ -205,7 +215,6 @@ const styles = StyleSheet.create({
   },
   input: {
     width: "100%",
-
     padding: 8,
     borderRadius: 20,
     color: "#000",

@@ -43,11 +43,18 @@ const UserInformation = () => {
       };
       await updateDoc(docRefGestor, values);
       setModalVisible(false);
-      removeUserData();
+      showMessage(
+        "success",
+        "Credenciales Cambiadas",
+        `Cerrando aplicación`
+      )
+      setTimeout(() => {
+        removeUserData();
+      }, 2000);
     } else {
       showMessage(
         "error",
-        "Error al subir a la nube",
+        "Error al cambiar credenciales",
         `Rellene todos los datos`
       );
     }
@@ -126,24 +133,26 @@ const UserInformation = () => {
         <View style={styles.modalContainer} className="relative">
           <View style={styles.modalContent}>
             <Text style={styles.modalText}>Editar Credenciales</Text>
-            <Text className="font-bold">Usuario:</Text>
+            <Text className="font-bold mb-2">Usuario:</Text>
             <TextInput
+              className="px-2 border border-gray-300"
               style={styles.modalInput}
               onChangeText={(e) => setEditUser(e)}
               placeholder={user?.gestor.gestor_user}
               placeholderTextColor="#888"
               keyboardType="default"
             />
-            <Text className="font-bold">Contraseña:</Text>
+            <Text className="font-bold mb-2">Contraseña:</Text>
             <TextInput
+              className="px-2 border border-gray-300"
               style={styles.modalInput}
               onChangeText={(e) => setEditPassword(e)}
-              placeholder={user?.gestor.gestor_password}
+              placeholder="Nueva contraseña"
               placeholderTextColor="#888"
               keyboardType="default"
             />
             <TouchableOpacity
-              className="absolute top-2 right-4"
+              className="absolute top-2 right-4 px-2"
               onPress={() => setModalVisible(false)}
             >
               <Text className="text-gray-400 text-lg p-1">X</Text>
@@ -163,8 +172,8 @@ const UserInformation = () => {
             </View>
           </View>
         </View>
-        <Toast />
       </Modal>
+      <Toast />
     </View>
   );
 };
@@ -231,9 +240,8 @@ const styles = StyleSheet.create({
   },
   modalInput: {
     width: "100%",
-    borderWidth: 0.5,
-    padding: 5,
-    borderRadius: 10,
+    padding: 10,
+    borderRadius: 16,
     color: "#000",
     fontSize: 16,
     marginBottom: 8,
